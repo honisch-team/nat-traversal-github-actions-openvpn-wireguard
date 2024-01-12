@@ -117,7 +117,7 @@ jobs:
         id: check
         run: >
           [[ "$(git log --pretty='%s' -n1)" =~ "OVPN: " ]]
-          && echo "::set-output name=run::true" || true
+          && echo "run=true" >> $GITHUB_OUTPUT || true
 
       # Setup build environment
       - name: Setup build environment
