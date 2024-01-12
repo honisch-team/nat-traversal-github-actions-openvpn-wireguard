@@ -23,7 +23,7 @@ concurrency:
 #  7. Run OpenVPN on UDP port 443
 
 jobs:
-    openvpn-server:
+  openvpn-server:
     name: OpenVPN Server
     runs-on: ubuntu-latest-m
     steps:
