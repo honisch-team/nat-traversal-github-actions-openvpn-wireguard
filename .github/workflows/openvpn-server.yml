@@ -126,7 +126,7 @@ jobs:
           VMWARE_WORKSTATION_VERSION: 17
         run: |
           echo "VMware Workstation $VMWARE_WORKSTATION_VERSION"
-          bash ./build/github_build_helper.sh install-build-tools ${{inputs.virt-provider-id}} ${{runner.os}} build
+          bash ./build/github_build_helper.sh install-build-tools vmx ${{runner.os}} build
 
       # Get install image
       - name: Get install image
