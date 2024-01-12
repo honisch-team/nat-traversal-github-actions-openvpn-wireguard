@@ -23,84 +23,7 @@ concurrency:
 #  7. Run OpenVPN on UDP port 443
 
 jobs:
-  # Create install media
-  create-install-media:
-    runs-on: windows-2022
-    timeout-minutes: 60
-    steps:
-      # Check out
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Determine cache keys
-      - name: Get cache keys
-        id: get-cache-keys
-        shell: pwsh
-        run: |
-          ## Get cache key for downloads cache
-          $cacheKeys = ./build/github_build_helper.ps1 -GetInstallMediaCacheKeys -DownloadsCsvFile ./install-media/downloads.csv -ScriptFile ./install-media/create_install_image.ps1
-          echo $cacheKeys
-          echo "install-files-cache-key=$($cacheKeys.installFilesKey)" >> $env:GITHUB_OUTPUT
-          echo "install-image-cache-key=$($cacheKeys.installImageKey)" >> $env:GITHUB_OUTPUT
-
-      # Get cached install image
-      - name: Get cached install image
-        id: get-cached-install-image
-        uses: actions/cache@v3
-        with:
-          key: install-image-${{steps.get-cache-keys.outputs.install-image-cache-key}}
-          path: ./install-media/install.iso
-
-      # Get cached install files
-      - name: Get cached install files
-        id: get-cached-install-files
-        if: steps.get-cached-install-image.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          key: install-files-${{steps.get-cache-keys.outputs.install-files-cache-key}}
-          restore-keys: install-files-
-          path: ./install-media/downloads
-
-      # Download install files
-      - name: Download install files
-        id: download-install-files
-        if: (steps.get-cached-install-image.outputs.cache-hit != 'true') && (steps.get-cached-install-files.outputs.cache-hit != 'true')
-        shell: pwsh
-        run: ./install-media/download_install_files.ps1 -DownloadsCsvFile ./install-media/downloads.csv -OutputDir ./install-media/downloads -CleanupDownloads
-
-      # Verify install files
-      - name: Verify install files
-        id: verify-install-files
-        if: (steps.get-cached-install-image.outputs.cache-hit != 'true') && (steps.get-cached-install-files.outputs.cache-hit == 'true')
-        shell: pwsh
-        run: ./install-media/download_install_files.ps1 -DownloadsCsvFile ./install-media/downloads.csv -OutputDir ./install-media/downloads -VerifyOnly
-
-      # Install Windows ADK deployment tools
-      - name: Install Windows ADK deployment tools
-        if: steps.get-cached-install-image.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          ./build/github_build_helper.ps1 -InstallAdkDeploymentTools || throw "Error installing ADK deployment tools"
-          echo "Adding Oscdimg dir to PATH"
-          echo "${env:ProgramFiles(x86)}\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg" >> $env:GITHUB_PATH
-
-      # Create install image
-      - name: Create install image
-        if: steps.get-cached-install-image.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: ./install-media/create_install_image.ps1 -InstallFilesDir ./install-media/downloads -WorkDir ./install-media/work -Output ./install-media/install.iso
-
-      # Upload custom install image artifact
-      - name: Upload install image
-        uses: actions/upload-artifact@v4
-        with:
-          name: install-media
-          path: ./install-media/install.iso
-          retention-days: 5
-
-
-
-  openvpn-server:
+    openvpn-server:
     name: OpenVPN Server
     needs: create-install-media
     runs-on: ubuntu-latest-m
@@ -118,31 +41,6 @@ jobs:
         run: >
           [[ "$(git log --pretty='%s' -n1)" =~ "OVPN: " ]]
           && echo "run=true" >> $GITHUB_OUTPUT || true
-
-      # Setup build environment
-      - name: Setup build environment
-        if: ${{ steps.check.outputs.run }}
-        env:
-          VMWARE_WORKSTATION_VERSION: 17
-        run: |
-          echo "VMware Workstation $VMWARE_WORKSTATION_VERSION"
-          bash ./build/github_build_helper.sh install-build-tools vmw ${{runner.os}} build
-
-      # Get install image
-      - name: Get install image
-        if: ${{ steps.check.outputs.run }}
-        uses: actions/download-artifact@v4
-        with:
-          name: install-media
-          path: ./install-media/
-
-      # Check install image
-      - name: Check install image
-        if: ${{ steps.check.outputs.run }}
-        run: |
-          ls -l ./install-media/install.iso
-          shasum -a 1 ./install-media/install.iso
-
 
       # Extract IP address, external source port and local port of the client
       # from the top git commit message.
