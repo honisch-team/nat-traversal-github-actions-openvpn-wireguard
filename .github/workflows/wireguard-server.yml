@@ -1,7 +1,7 @@
 name: WireGuard Server
 
-on:
-  - push
+#on:
+#  - push
 
 concurrency:
   group: wireguard
