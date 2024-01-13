@@ -132,7 +132,7 @@ install_vmware_workstation() {
       # VMware Workstation 15
       echo "*** Downloading VMware Workstation 15"
 
-      local INSTALLER_FILE=VMware-Workstation-Full-15.5.7-16341506.x86_64.bundle
+      local INSTALLER_FILE=VMware-Workstation-15.5.7-17171714.x86_64.bundle.tar
       local DOWNLOAD_URL=https://download3.vmware.com/software/wkst/file/$INSTALLER_FILE
 
       curl -L -o $INSTALLER_FILE --retry 5 $DOWNLOAD_URL || exit $?
