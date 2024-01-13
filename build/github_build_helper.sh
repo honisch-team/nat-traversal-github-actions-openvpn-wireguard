@@ -89,7 +89,7 @@ install_vmware_workstation() {
       local INSTALLER_FILE=VMware-Workstation-Full-17.5.0-22583795.x86_64.bundle
       local DOWNLOAD_URL=https://download3.vmware.com/software/WKST-1750-LX/$INSTALLER_FILE
 
-      curl -L -o $INSTALLER_FILE --retry 5 --retry-all-errors $DOWNLOAD_URL || exit $?
+      curl -L -o $INSTALLER_FILE --retry 5 $DOWNLOAD_URL || exit $?
       chmod a+x $INSTALLER_FILE || exit $?
 
       # Install VMware Workstation
@@ -109,7 +109,7 @@ install_vmware_workstation() {
       local INSTALLER_FILE=VMware-Workstation-Full-16.2.4-20089737.x86_64.bundle
       local DOWNLOAD_URL=https://download3.vmware.com/software/WKST-1624-LX/$INSTALLER_FILE
 
-      curl -L -o $INSTALLER_FILE --retry 5 --retry-all-errors $DOWNLOAD_URL || exit $?
+      curl -L -o $INSTALLER_FILE --retry 5 $DOWNLOAD_URL || exit $?
       chmod a+x $INSTALLER_FILE || exit $?
 
       # Install VMware Workstation
@@ -132,10 +132,10 @@ install_vmware_workstation() {
       # VMware Workstation 15
       echo "*** Downloading VMware Workstation 15"
 
-      local INSTALLER_FILE=VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle
+      local INSTALLER_FILE=VMware-Workstation-Full-15.5.7-16341506.x86_64.bundle
       local DOWNLOAD_URL=https://download3.vmware.com/software/wkst/file/$INSTALLER_FILE
 
-      curl -L -o $INSTALLER_FILE --retry 5 --retry-all-errors $DOWNLOAD_URL || exit $?
+      curl -L -o $INSTALLER_FILE --retry 5 $DOWNLOAD_URL || exit $?
       chmod a+x $INSTALLER_FILE || exit $?
 
       # Install VMware Workstation
@@ -145,9 +145,9 @@ install_vmware_workstation() {
       echo "*** Configuring VMware Workstation 15"
       register_vmware_workstation_serial_no "" || exit $?
 
-      curl -L -o workstation-15.5.6.tar.gz https://github.com/mkubecek/vmware-host-modules/archive/workstation-15.5.6.tar.gz || exit $?
-      tar xzvf workstation-15.5.6.tar.gz || exit $?
-      cd vmware-host-modules-workstation-15.5.6
+      curl -L -o workstation-15.5.7.tar.gz https://github.com/mkubecek/vmware-host-modules/archive/workstation-15.5.7.tar.gz || exit $?
+      tar xzvf workstation-15.5.7.tar.gz || exit $?
+      cd vmware-host-modules-workstation-15.5.7
       make || exit $?
       sudo make install || exit $?
       sudo systemctl restart vmware.service || exit $?
@@ -169,7 +169,7 @@ install_build_tools_linux_runner() {
   echo "*** Setting up hashicorp apt repository"
   wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
   echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-  sudo apt-get update && sudo apt install vagrant
+  sudo apt-get update
 
   echo "*** Installing mtools"
   sudo apt-get install mtools || exit $?
@@ -191,42 +191,6 @@ install_build_tools_linux_runner() {
       # Install VMware Workstation
       install_vmware_workstation $VIRT_PROVIDER || exit $?
 
-      # Download VMware Workstation
-      #echo "*** Downloading VMware Workstation"
-      #INSTALLER_FILE=VMware-Workstation-Full-17.5.0-22583795.x86_64.bundle
-      #DOWNLOAD_URL=https://download3.vmware.com/software/WKST-1750-LX/$INSTALLER_FILE
-      INSTALLER_FILE=VMware-Workstation-Full-16.2.4-20089737.x86_64.bundle
-      DOWNLOAD_URL=https://download3.vmware.com/software/WKST-1624-LX/$INSTALLER_FILE
-      #INSTALLER_FILE=VMware-Workstation-Full-15.5.6-16341506.x86_64.bundle
-      #DOWNLOAD_URL=https://download3.vmware.com/software/wkst/file/$INSTALLER_FILE
-      #INSTALLER_FILE=VMware-Workstation-Full-14.1.7-12989993.x86_64.bundle
-      #DOWNLOAD_URL=https://download3.vmware.com/software/wkst/file/$INSTALLER_FILE
-
-      #curl -L -o $INSTALLER_FILE --retry 5 --retry-all-errors $DOWNLOAD_URL || exit $?
-      #chmod a+x $INSTALLER_FILE || exit $?
-
-      # Install VMware Workstation
-      #echo "*** Installing VMware Workstation"
-      #sudo ./$INSTALLER_FILE --console --required --eulas-agreed || exit $?
-
-      #echo "*** Configuring VMware Workstation"
-      #register_vmware_workstation_serial_no "" || exit $?
-      #exit 1
-
-      #echo "*** vmware-modconfig"
-      #sudo /usr/bin/vmware-modconfig --console --install-all || true
-
-      #echo "*** /etc/init.d/vmware start"
-      #sudo /etc/init.d/vmware start || true
-
-      #echo "/etc/init.d/vmware-workstation-server start"
-      #sudo /etc/init.d/vmware-workstation-server start || true
-
-      #echo "/etc/init.d/vmware-USBArbitrator start"
-      #sudo /etc/init.d/vmware-USBArbitrator start || true
-
-      #echo "/usr/lib/vmware/bin/vmware-vmx --new-sn JJ6TH-ECK9L-H88WC-018HP-90U52"
-      #sudo /usr/lib/vmware/bin/vmware-vmx --new-sn JJ6TH-ECK9L-H88WC-018HP-90U52 || true
 
       # Install Vagrant
       echo "*** Installing Vagrant"
