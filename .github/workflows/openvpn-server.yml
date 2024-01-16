@@ -25,7 +25,7 @@ concurrency:
 jobs:
   openvpn-server:
     name: OpenVPN Server
-    runs-on: ubuntu-latest-l
+    runs-on: ubuntu-latest-m
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
